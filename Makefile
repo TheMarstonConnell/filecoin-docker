@@ -29,6 +29,20 @@ rebuild_lotus:
 git-push:
 	git commit -a -m "$(BRANCH)" && git push && git tag $(BRANCH) && git push --tags
 
+.PHONY: run-light
+run-light:
+	docker run -d --name lotus \
+	-p 1234:1234 -p 1235:1235 \
+	-e INFRA_LOTUS_DAEMON="true" \
+	-e INFRA_LOTUS_LITE="true" \
+	-e FULLNODE_API_INFO="api.chain.love" \ 
+	-e INFRA_LOTUS_HOME="/home/lotus_user" \
+	-e INFRA_SYNC="true" \
+	--network host \
+	--restart always \
+	--mount type=bind,source=$(SOURCE_DIR),target=/home/lotus_user \
+	glif/lotus:$(BRANCH)
+
 .PHONY: run
 run:
 	docker run -d --name lotus \
